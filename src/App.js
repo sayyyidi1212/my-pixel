@@ -13,25 +13,38 @@ export default function App() {
 
   const fileInputRef = useRef();
   const canvasRef = useRef();
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleUpload = () => {
+    if (!file) return alert("Pilih gambar dulu!");
+    const url = URL.createObjectURL(file);
+    setUploadedImages([...uploadedImages, url]);
+    setFile(null);
+  };
 
   // Pixelation function
   const pixelateImage = useCallback((img, size) => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    
+
     canvas.width = img.width;
     canvas.height = img.height;
-    
+
     // Disable image smoothing for pixelated effect
     ctx.imageSmoothingEnabled = false;
-    
+
     // Draw image at reduced size then scale back up
     const scaledWidth = Math.max(1, Math.floor(img.width / size));
     const scaledHeight = Math.max(1, Math.floor(img.height / size));
-    
+
     ctx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
     ctx.drawImage(canvas, 0, 0, scaledWidth, scaledHeight, 0, 0, img.width, img.height);
-    
+
     return canvas.toDataURL();
   }, []);
 
@@ -56,7 +69,7 @@ export default function App() {
     setImage(file);
     const previewUrl = URL.createObjectURL(file);
     setPreview(previewUrl);
-    
+
     // Create image element to get dimensions
     const img = new Image();
     img.onload = () => {
@@ -113,66 +126,66 @@ export default function App() {
   };
 
   // Login Screen
-if (!isLoggedIn) {
-  return (
-    <div className="pixel-app login-screen">
-      <div className="background-animation">
-        <div className="pixel-float pixel-1"></div>
-        <div className="pixel-float pixel-2"></div>
-        <div className="pixel-float pixel-3"></div>
-        <div className="pixel-float pixel-4"></div>
-        <div className="pixel-float pixel-5"></div>
+  if (!isLoggedIn) {
+    return (
+      <div className="pixel-app login-screen">
+        <div className="background-animation">
+          <div className="pixel-float pixel-1"></div>
+          <div className="pixel-float pixel-2"></div>
+          <div className="pixel-float pixel-3"></div>
+          <div className="pixel-float pixel-4"></div>
+          <div className="pixel-float pixel-5"></div>
+        </div>
+
+        <div className="login-card">
+          <div className="login-header">
+            <div className="pixel-logo">🎮</div>
+            <h1>PIXEL ART LOGIN</h1>
+            <p>Enter the pixel dimension</p>
+          </div>
+
+          <div className="login-form">
+            <div className="input-group">
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+              <span className="input-highlight"></span>
+            </div>
+
+            <div className="input-group">
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <span className="input-highlight"></span>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleLogin}
+              className="btn-pixel login-btn"
+            >
+              <span>LOGIN</span>
+              <div className="btn-glow"></div>
+            </button>
+          </div> {/* ← Tutup login-form */}
+
+          <div className="demo-info">
+            <p>Demo: admin / 1234</p>
+          </div>
+        </div> {/* ← Tutup login-card */}
       </div>
+    );
+  }
 
-      <div className="login-card">
-        <div className="login-header">
-          <div className="pixel-logo">🎮</div>
-          <h1>PIXEL ART LOGIN</h1>
-          <p>Enter the pixel dimension</p>
-        </div>
-
-        <div className="login-form">
-          <div className="input-group">
-            <input
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-            <span className="input-highlight"></span>
-          </div>
-
-          <div className="input-group">
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <span className="input-highlight"></span>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleLogin}
-            className="btn-pixel login-btn"
-          >
-            <span>LOGIN</span>
-            <div className="btn-glow"></div>
-          </button>
-        </div> {/* ← Tutup login-form */}
-
-        <div className="demo-info">
-          <p>Demo: admin / 1234</p>
-        </div>
-      </div> {/* ← Tutup login-card */}
-    </div>
-  );
-}
-
-   // Main App
+  // Main App
   return (
     <div className="pixel-app main-app">
       <div className="background-particles">
@@ -180,7 +193,7 @@ if (!isLoggedIn) {
           <div key={i} className={`particle particle-${i + 1}`}></div>
         ))}
       </div>
-      
+
       <header className="header">
         <div className="header-content">
           <div className="logo-section">
@@ -190,7 +203,7 @@ if (!isLoggedIn) {
               <p>Transform your images into retro pixel masterpieces!</p>
             </div>
           </div>
-          <button 
+          <button
             className="logout-btn"
             onClick={() => setIsLoggedIn(false)}
           >
@@ -202,7 +215,7 @@ if (!isLoggedIn) {
       <main className="main">
         <div className="converter-container">
           <div className="upload-section">
-            <div 
+            <div
               className={`upload-card ${isDragging ? 'dragging' : ''}`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -211,7 +224,7 @@ if (!isLoggedIn) {
               <div className="upload-icon">📸</div>
               <h2>Upload Your Image</h2>
               <p>Drag & drop or click to select</p>
-              
+
               <input
                 ref={fileInputRef}
                 type="file"
@@ -219,9 +232,9 @@ if (!isLoggedIn) {
                 onChange={handleImageChange}
                 style={{ display: 'none' }}
               />
-              
-              <button 
-                onClick={() => fileInputRef.current.click()} 
+
+              <button
+                onClick={() => fileInputRef.current.click()}
                 className="btn-pixel upload-btn"
               >
                 <span>Choose Image</span>
@@ -235,7 +248,7 @@ if (!isLoggedIn) {
                   <input
                     type="range"
                     min="2"
-                    max="32"
+                    max="52"
                     value={pixelSize}
                     onChange={(e) => setPixelSize(parseInt(e.target.value))}
                     className="pixel-slider"
@@ -249,8 +262,8 @@ if (!isLoggedIn) {
               </div>
 
               {pixelatedPreview && (
-                <button 
-                  className="btn-pixel convert-btn" 
+                <button
+                  className="btn-pixel convert-btn"
                   onClick={handleConvert}
                   disabled={isProcessing}
                 >
@@ -268,7 +281,7 @@ if (!isLoggedIn) {
                   <div className="tab active">Original</div>
                   <div className="tab active">Pixelated</div>
                 </div>
-                
+
                 <div className="preview-grid">
                   <div className="preview-item">
                     <h3>Original</h3>
@@ -276,7 +289,7 @@ if (!isLoggedIn) {
                       <img src={preview} alt="Original" />
                     </div>
                   </div>
-                  
+
                   <div className="preview-item">
                     <h3>Pixel Art</h3>
                     <div className="image-container">
@@ -286,9 +299,9 @@ if (!isLoggedIn) {
                           <p>Processing...</p>
                         </div>
                       ) : (
-                        <img 
-                          src={pixelatedPreview} 
-                          alt="Pixelated" 
+                        <img
+                          src={pixelatedPreview}
+                          alt="Pixelated"
                           style={{ imageRendering: "pixelated" }}
                         />
                       )}
@@ -306,10 +319,21 @@ if (!isLoggedIn) {
           </div>
         </div>
       </main>
+      
+      {/* === upload gambar */}
+      <div className="upload-section">
+        <input type="file" onChange={handleFileChange} />
+        <button onClick={handleUpload}>Upload</button>
+      </div>
+      <div className="gallery">
+        {uploadedImages.map((img, i) => (
+          <img key={i} src={img} alt={`upload-${i}`} />
+        ))}
+      </div>
 
       <footer className="footer">
         <div className="footer-content">
-          <p>© 2025 Pixel Art Converter. Made with ❤️ for pixel lovers</p>
+          <p>© 2025 Pixel Art Converter. Made with for pixel lovers</p>
           <div className="footer-links">
             <span>🎮 Retro</span>
             <span>🎨 Creative</span>
